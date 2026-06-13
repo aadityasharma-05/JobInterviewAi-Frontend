@@ -60,7 +60,8 @@ export async function getMe() {
         return response.data
 
     } catch (err) {
-        console.log(err)
+        console.error("getMe API Error:", err)
+        throw err
     }
 
 }
