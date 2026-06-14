@@ -1,19 +1,20 @@
 import axios from "axios"
 
 // No baseURL — uses relative paths so Vite proxy forwards /api/* to the backend
-const api = axios.create()
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+})
 
 // Add a request interceptor to attach the token
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("token")
+
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
-    return config
-}, (error) => {
-    return Promise.reject(error)
-})
 
+    return config
+})
 export async function register({ username, email, password }) {
     try {
         const response = await api.post('/api/auth/register', {
