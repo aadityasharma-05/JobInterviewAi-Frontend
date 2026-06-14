@@ -1,19 +1,46 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import '../style/interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 
 
 const NAV_ITEMS = [
-    { id: 'technical', label: 'Technical Questions', icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>) },
-    { id: 'behavioral', label: 'Behavioral Questions', icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>) },
-    { id: 'roadmap', label: 'Road Map', icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>) },
+    {
+        id: 'technical',
+        label: 'Technical Questions',
+        icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>)
+    },
+    {
+        id: 'behavioral',
+        label: 'Behavioral Questions',
+        icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>)
+    },
+    {
+        id: 'strengths',
+        label: 'Strengths',
+        icon: (<span>💪</span>)
+    },
+    {
+        id: 'weaknesses',
+        label: 'Weaknesses',
+        icon: (<span>⚠️</span>)
+    },
+    {
+        id: 'ats',
+        label: 'ATS Tips',
+        icon: (<span>📄</span>)
+    },
+    {
+        id: 'roadmap',
+        label: 'Road Map',
+        icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>)
+    },
 ]
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const QuestionCard = ({ item, index }) => {
-    const [ open, setOpen ] = useState(false)
+    const [open, setOpen] = useState(false)
     return (
         <div className='q-card'>
             <div className='q-card__header' onClick={() => setOpen(o => !o)}>
@@ -39,12 +66,42 @@ const QuestionCard = ({ item, index }) => {
     )
 }
 
+// const RoadMapDay = ({ day }) => (
+
+//     <div className='roadmap-day'>
+//         <div className='roadmap-day__header'>
+//             <span className='roadmap-day__badge'>Day {day.day}</span>
+//             <h3 className='roadmap-day__focus'>{day.focus}</h3>
+//         </div>
+//         <ul className='roadmap-day__tasks'>
+//             {day.tasks.map((task, i) => (
+//                 <li key={i}>
+//                     <span className='roadmap-day__bullet' />
+//                     {task}
+//                 </li>
+//             ))}
+//         </ul>
+//     </div>
+
 const RoadMapDay = ({ day }) => (
     <div className='roadmap-day'>
         <div className='roadmap-day__header'>
-            <span className='roadmap-day__badge'>Day {day.day}</span>
-            <h3 className='roadmap-day__focus'>{day.focus}</h3>
+            <span className='roadmap-day__badge'>
+                Day {day.day}
+            </span>
+
+            <h3 className='roadmap-day__focus'>
+                {day.focus}
+            </h3>
         </div>
+
+        <p style={{
+            marginBottom: "10px",
+            color: "#888"
+        }}>
+            Study Hours: {day.studyHours || 2}
+        </p>
+
         <ul className='roadmap-day__tasks'>
             {day.tasks.map((task, i) => (
                 <li key={i}>
@@ -58,15 +115,11 @@ const RoadMapDay = ({ day }) => (
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
-    const [ activeNav, setActiveNav ] = useState('technical')
-    const { report, getReportById, loading, getResumePdf } = useInterview()
+    const [activeNav, setActiveNav] = useState('technical')
+    const { report, loading, getResumePdf } = useInterview()
     const { interviewId } = useParams()
+    // Note: getReportById is already called inside useInterview's useEffect when interviewId changes
 
-    useEffect(() => {
-        if (interviewId) {
-            getReportById(interviewId)
-        }
-    }, [ interviewId ])
 
 
 
@@ -126,6 +179,58 @@ const Interview = () => {
                                 ))}
                             </div>
                         </section>
+                    )} {activeNav === 'strengths' && (
+                        <section>
+                            <div className='content-header'>
+                                <h2>Strengths</h2>
+                            </div>
+
+                            <div className='q-list'>
+                                {report.strengths?.map((item, index) => (
+                                    <div className='q-card' key={index}>
+                                        <div className='q-card__body'>
+                                            <p>{item}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {activeNav === 'weaknesses' && (
+                        <section>
+                            <div className='content-header'>
+                                <h2>Weaknesses</h2>
+                            </div>
+
+                            <div className='q-list'>
+                                {report.weaknesses?.map((item, index) => (
+                                    <div className='q-card' key={index}>
+                                        <div className='q-card__body'>
+                                            <p>{item}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {activeNav === 'ats' && (
+                        <section>
+                            <div className='content-header'>
+                                <h2>ATS Resume Suggestions</h2>
+                            </div>
+
+                            <div className='q-list'>
+                                {report.atsSuggestions?.map((item, index) => (
+                                    <div className='q-card' key={index}>
+                                        <div className='q-card__body'>
+                                            <p>{item}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
                     )}
 
                     {activeNav === 'behavioral' && (
@@ -169,7 +274,14 @@ const Interview = () => {
                             <span className='match-score__value'>{report.matchScore}</span>
                             <span className='match-score__pct'>%</span>
                         </div>
-                        <p className='match-score__sub'>Strong match for this role</p>
+                        {/* // <p className='match-score__sub'>Strong match for this role</p> */}
+                        <p className='match-score__sub'>
+                            {report.matchScore >= 80
+                                ? "Excellent Match"
+                                : report.matchScore >= 60
+                                    ? "Good Match"
+                                    : "Needs Improvement"}
+                        </p>
                     </div>
 
                     <div className='sidebar-divider' />

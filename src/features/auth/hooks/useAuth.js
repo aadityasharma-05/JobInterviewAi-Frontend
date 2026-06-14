@@ -3,20 +3,21 @@ import { AuthContext } from "../auth.context";
 import { login, register, logout, getMe } from "../services/auth.api";
 
 
-
 export const useAuth = () => {
 
     const context = useContext(AuthContext)
     const { user, setUser, loading, setLoading } = context
 
-
     const handleLogin = async ({ email, password }) => {
         setLoading(true)
         try {
             const data = await login({ email, password })
-            setUser(data.user)
+            if (data && data.user) {
+                setUser(data.user)
+            }
         } catch (err) {
-
+            // Re-throw so Login.jsx can display the error message
+            throw err
         } finally {
             setLoading(false)
         }
@@ -26,9 +27,12 @@ export const useAuth = () => {
         setLoading(true)
         try {
             const data = await register({ username, email, password })
-            setUser(data.user)
+            if (data && data.user) {
+                setUser(data.user)
+            }
         } catch (err) {
-
+            // Re-throw so Register.jsx can display the error message
+            throw err
         } finally {
             setLoading(false)
         }
@@ -37,10 +41,11 @@ export const useAuth = () => {
     const handleLogout = async () => {
         setLoading(true)
         try {
-            const data = await logout()
+            await logout()
             setUser(null)
         } catch (err) {
-
+            // Even if logout API fails, clear user locally
+            setUser(null)
         } finally {
             setLoading(false)
         }
@@ -56,7 +61,8 @@ export const useAuth = () => {
                 } else {
                     setUser(null)
                 }
-            } catch (err) { 
+            } catch (err) {
+                // 401 = not logged in, that's fine
                 setUser(null)
             } finally {
                 setLoading(false)
